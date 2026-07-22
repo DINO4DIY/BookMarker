@@ -1,4 +1,4 @@
-# URL Bookmark Organizer
+# BookMarker
 
 A full-stack application for organizing and categorizing bookmarks, built with React, Hono, and oRPC.
 
