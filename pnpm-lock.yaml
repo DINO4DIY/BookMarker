@@ -1,3 +1,24 @@
+---
+lockfileVersion: '9.0'
+
+importers:
+
+  .:
+    configDependencies:
+      '@pnpm/plugin-trusted-deps':
+        specifier: 0.2.0
+        version: 0.2.0
+
+packages:
+
+  '@pnpm/plugin-trusted-deps@0.2.0':
+    resolution: {integrity: sha512-jqiCC8kyrwOERwMWPo2RB1YlDMMS5WsPSA8Uwi3EXAYwyOSNtqKhrB9bs543JGUiz4yaA9h6nE3q98fG14AEyQ==}
+
+snapshots:
+
+  '@pnpm/plugin-trusted-deps@0.2.0': {}
+
+---
 lockfileVersion: '9.0'
 
 settings:
