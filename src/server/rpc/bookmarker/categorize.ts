@@ -1,11 +1,10 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { generateText, Output } from "ai";
+import { generateText } from "ai";
 import { os } from "@orpc/server";
 import { z } from "zod";
 
 const MODEL = "openrouter/auto";
 
-// Predefined categories with descriptions to help the AI classify URLs
 const CATEGORIES = [
   "News",
   "Technology",
@@ -25,15 +24,6 @@ const CATEGORIES = [
   "Other",
 ] as const;
 
-const CategorizeResultSchema = z.object({
-  category: z
-    .string()
-    .describe(
-      `The best category for this URL. Must be one of: ${CATEGORIES.join(", ")}`
-    ),
-  title: z.string().describe("A short, clean title for the bookmark"),
-});
-
 const categorize = os
   .input(
     z.object({
@@ -45,33 +35,33 @@ const categorize = os
       apiKey: process.env.OPENROUTER_API_KEY,
     });
 
-    const { output } = await generateText({
-      model: openrouter(MODEL),
-      output: Output.object({
-        schema: CategorizeResultSchema,
-      }),
-      system: `You are a URL categorization assistant. Given a URL, determine the most appropriate category and generate a clean title for the bookmark.
+    const categoriesList = CATEGORIES.join(", ");
 
-Available categories: ${CATEGORIES.join(", ")}
+    const { text } = await generateText({
+      model: openrouter(MODEL),
+      system: `You are a URL categorization assistant. Given a URL, you must respond with exactly two lines:
+Line 1: A short, clean bookmark title.
+Line 2: The best category from this list: ${categoriesList}
 
 Rules:
 - If the URL suggests a programming/dev site, prefer "Development" over "Technology"
 - If the URL is clearly a news article, categorize as "News"
-- If it's a specific tool or library, prefer the most specific category
 - Default to "Other" only if nothing fits well`,
-      prompt: `Categorize this URL and create a bookmark title: ${input.url}`,
+      prompt: `Categorize this URL: ${input.url}`,
+      temperature: 0.1,
     });
 
-    // Ensure the category is one of the valid ones, fallback to "Other"
-    const validCategories: readonly string[] = CATEGORIES;
-    const category = validCategories.includes(output.category)
-      ? output.category
-      : "Other";
+    const lines = text.trim().split("\n");
+    const title = lines[0]?.trim() || input.url;
+    const rawCategory = lines[1]?.trim() || "Other";
 
-    return {
-      category,
-      title: output.title,
-    };
+    // Normalize category to match our valid list
+    const found = CATEGORIES.find(
+      (c) => c.toLowerCase() === rawCategory.toLowerCase()
+    );
+    const category = found || "Other";
+
+    return { category, title };
   });
 
 export const router = {
