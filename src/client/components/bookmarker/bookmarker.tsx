@@ -5,6 +5,7 @@ import { queryClient, rpcClient } from "@/client/rpc-client";
 export function BookMarker() {
   const [url, setUrl] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [urlError, setUrlError] = useState("");
 
   // Live data query for bookmarks
   const {
@@ -33,13 +34,32 @@ export function BookMarker() {
     if (!url.trim()) return;
     const trimmedUrl = url.trim();
 
-    // Try to validate URL format
+    // Validate URL format
     let validUrl: string;
     try {
       validUrl = new URL(trimmedUrl).toString();
+      // Ensure it has http or https protocol
+      if (!validUrl.startsWith("http://") && !validUrl.startsWith("https://")) {
+        setUrlError("Please enter a valid URL starting with http:// or https://");
+        return;
+      }
     } catch {
-      validUrl = trimmedUrl.startsWith("http") ? trimmedUrl : `https://${trimmedUrl}`;
+      // Try adding https:// prefix
+      try {
+        validUrl = new URL(`https://${trimmedUrl}`).toString();
+        // Check that it looks like a real URL with a domain
+        const hostname = new URL(validUrl).hostname;
+        if (!hostname.includes(".")) {
+          setUrlError("Please enter a valid URL (e.g. https://example.com)");
+          return;
+        }
+      } catch {
+        setUrlError("Please enter a valid URL (e.g. https://example.com)");
+        return;
+      }
     }
+
+    setUrlError("");
 
     categorize(
       { url: validUrl },
@@ -96,11 +116,14 @@ export function BookMarker() {
       {/* URL Input */}
       <div className="flex gap-3">
         <input
-          className="flex-1 p-3 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className={`flex-1 p-3 border rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${urlError ? "border-red-400 bg-red-50" : "border-gray-300"}`}
           type="text"
           placeholder="Paste a URL here..."
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={(e) => {
+            setUrl(e.target.value);
+            if (urlError) setUrlError("");
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" && url.trim() && !isProcessing) {
               handleAddBookmark();
@@ -115,6 +138,10 @@ export function BookMarker() {
           {isProcessing ? "Adding..." : "Add Bookmark"}
         </button>
       </div>
+
+      {urlError && (
+        <p className="text-red-600 text-sm -mt-6">{urlError}</p>
+      )}
 
       {categorizeError && (
         <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
