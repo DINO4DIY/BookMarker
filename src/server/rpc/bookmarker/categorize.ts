@@ -1,7 +1,7 @@
 import { os } from "@orpc/server";
 import { z } from "zod";
 
-const MODEL = "nvidia/llama-3.1-nemotron-nano-8b-v1";
+const MODEL = "deepseek-ai/deepseek-v4-pro";
 
 const CATEGORIES = [
   "News",
