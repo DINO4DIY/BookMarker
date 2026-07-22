@@ -26,7 +26,11 @@ const CATEGORIES = [
 ] as const;
 
 const CategorizeResultSchema = z.object({
-  category: z.enum(CATEGORIES).describe("The best category for this URL"),
+  category: z
+    .string()
+    .describe(
+      `The best category for this URL. Must be one of: ${CATEGORIES.join(", ")}`
+    ),
   title: z.string().describe("A short, clean title for the bookmark"),
 });
 
@@ -58,7 +62,16 @@ Rules:
       prompt: `Categorize this URL and create a bookmark title: ${input.url}`,
     });
 
-    return output;
+    // Ensure the category is one of the valid ones, fallback to "Other"
+    const validCategories: readonly string[] = CATEGORIES;
+    const category = validCategories.includes(output.category)
+      ? output.category
+      : "Other";
+
+    return {
+      category,
+      title: output.title,
+    };
   });
 
 export const router = {
