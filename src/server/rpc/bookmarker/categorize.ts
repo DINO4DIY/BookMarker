@@ -31,8 +31,20 @@ const categorize = os
     })
   )
   .handler(async ({ input }) => {
+    const apiKey = process.env.OPENROUTER_API_KEY;
+
+    // Fallback when no API key is configured
+    if (!apiKey) {
+      const urlObj = new URL(input.url);
+      const hostname = urlObj.hostname.replace(/^www\./, "");
+      return {
+        title: hostname,
+        category: "Other",
+      };
+    }
+
     const openrouter = createOpenRouter({
-      apiKey: process.env.OPENROUTER_API_KEY,
+      apiKey,
     });
 
     const categoriesList = CATEGORIES.join(", ");
