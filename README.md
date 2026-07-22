@@ -1,17 +1,66 @@
-# Quests Starter Template
+# URL Bookmark Organizer
 
-The Quests default starter template is a simple, yet powerful micro-framework for building full-stack apps.
+A full-stack application for organizing and categorizing bookmarks, built with React, Hono, and oRPC.
 
-**React** serves as the frontend component framework, leveraging the large React ecosystem of components and frontend functionality. The application is built and served by **Vite**, a modern and efficient bundler and dev server. **Tailwind CSS V4** is used for styling the app and works well with the Quests AI Agent.
+## Tech Stack
 
-The Quest starter template is fully capable of building full stack applications with backend APIs. It ships out of the box with support for **Hono** and **oRPC** to build type-safe APIs.
+- **Frontend**: React 19 + Vite + Tailwind CSS v4
+- **Backend**: Hono with oRPC for type-safe APIs
+- **Validation**: Zod
+- **Storage**: unstorage (file-based key-value store)
+- **AI**: Vercel AI SDK with OpenAI/OpenRouter provider support
 
-## Dependencies
+## Getting Started
 
-- [TypeScript](https://www.typescriptlang.org/)
-- [React](https://react.dev/)
-- [Vite](https://vite.dev/)
-- [Tailwind CSS V4](https://tailwindcss.com/)
-- [oRPC](https://orpc.unnoq.com/)
-- [Hono](https://hono.dev/)
-- [Zod](https://zod.dev/)
+Install dependencies:
+
+```bash
+pnpm install
+```
+
+Start the development server:
+
+```bash
+pnpm dev
+```
+
+Build for production:
+
+```bash
+pnpm build
+```
+
+Preview the production build:
+
+```bash
+pnpm preview
+```
+
+## Project Structure
+
+```
+src/
+  client/           # React frontend
+    components/     # UI components organized by feature
+    styles/         # Global CSS (Tailwind)
+  server/           # Hono backend
+    lib/            # Shared utilities (e.g. KV storage)
+    rpc/            # oRPC procedure definitions
+      bookmarker/   # Bookmark organization logic
+      demo/         # Reference implementations
+    routes/         # HTTP route definitions
+```
+
+## Architecture
+
+The app uses oRPC to provide full-stack type safety — API procedures defined on the server are consumed on the client with automatic TypeScript types. The server serves both the API (`/rpc`) and static files (`/input/`, `/output/`), with all other routes falling through to the React client entry point.
+
+## Key Dependencies
+
+- [React](https://react.dev/) - UI framework
+- [Vite](https://vite.dev/) — Build tool & dev server
+- [Tailwind CSS v4](https://tailwindcss.com/) — Utility-first CSS
+- [oRPC](https://orpc.unnoq.com/) — Type-safe RPC
+- [Hono](https://hono.dev/) — Server framework
+- [Zod](https://zod.dev/) — Schema validation
+- [unstorage](https://unstorage.unjs.io/) — Key-value storage
